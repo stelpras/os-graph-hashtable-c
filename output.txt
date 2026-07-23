@@ -1,0 +1,36 @@
+Node 1:
+    Edge to: 15, Amount: 4000, Date: 2024-02-13
+Node 15:
+    Edge to: 8, Amount: 700, Date: 2024-08-26
+Node 5:
+    Edge to: 12, Amount: 1100, Date: 2024-03-31
+Node 12:
+    Edge to: 4, Amount: 1600, Date: 2024-08-19
+    Edge to: 4, Amount: 2700, Date: 2024-04-09
+Node 6:
+    Edge to: 12, Amount: 4000, Date: 2024-06-14
+Node 7:
+    Edge to: 5, Amount: 400, Date: 2024-02-08
+    Edge to: 3, Amount: 4900, Date: 2024-08-10
+    Edge to: 14, Amount: 1300, Date: 2024-01-18
+Node 14:
+    Edge to: 16, Amount: 100, Date: 2024-04-16
+    Edge to: 2, Amount: 4000, Date: 2024-04-27
+Node 3:
+Node 8:
+    Edge to: 11, Amount: 500, Date: 2024-08-13
+    Edge to: 9, Amount: 600, Date: 2024-10-22
+Node 9:
+    Edge to: 16, Amount: 2100, Date: 2024-05-25
+    Edge to: 1, Amount: 2100, Date: 2024-03-28
+Node 11:
+    Edge to: 2, Amount: 3500, Date: 2024-08-15
+    Edge to: 5, Amount: 1000, Date: 2024-03-11
+Node 16:
+    Edge to: 7, Amount: 1200, Date: 2024-04-29
+Node 2:
+Node 4:
+Node 13:
+    Edge to: 8, Amount: 2000, Date: 2024-08-30
+    Edge to: 8, Amount: 4300, Date: 2024-07-31
+    Edge to: 7, Amount: 4200, Date: 2024-08-06

@@ -1,0 +1,12 @@
+Graph* createGraph(int initialCapacity);
+void resizeGraph(Graph* graph);
+Node* createNode(char* name, int index);
+void addNode(Graph* graph, HashTable* ht, char* name);
+Edge* createEdge(Node* dest, int weight, char* date);
+void addEdge(Graph* graph, char* srcName, char* destName, int weight, char* date);
+void deleteEdge(Node* srcNode, char* destName);
+void deleteEdgeFromGraph(Graph* graph, HashTable* ht, char* srcName, char* destName);
+void deleteOutgoingEdges(Node* node);
+void deleteIncomingEdges(Graph* graph, char* nodeName);
+void deleteNodeFromGraph(Graph* graph, HashTable* ht, char* name);
+size_t freeGraph(Graph* graph);
