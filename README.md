@@ -34,28 +34,64 @@ make clean
 Every command has a short version and a longer, more readable version, and both work the same way.
 
 i or insert followed by one or more account names adds new accounts.
+```
+i Alice Bob Charlie
+```
 
 n or insert2 followed by two accounts, an amount and a date adds a transaction between them.
+```
+n Alice Bob 500 01-06-2025
+```
 
 d or delete followed by account names removes those accounts along with their transactions.
+```
+d Charlie
+```
 
 l or delete2 followed by two accounts removes the transaction between them.
+```
+l Alice Bob
+```
 
 m or modify takes two accounts plus the old amount/date and the new amount/date, and updates that transaction.
+```
+m Alice Bob 500 01-06-2025 750 15-06-2025
+```
 
 f or find followed by an account shows everything going out of it.
+```
+f Alice
+```
 
 r or receiving followed by an account shows everything coming into it.
+```
+r Bob
+```
 
 c or circlefind followed by an account looks for cycles that start and end there.
+```
+c Alice
+```
 
 fi or findcircles takes an account and a minimum weight, and only looks for cycles where every edge in them is at least that big.
+```
+fi Alice 100
+```
 
 t or traceflow takes an account and a depth, and prints every path you can reach going that many steps out.
+```
+t Alice 3
+```
 
 o or connect takes two accounts and tells you if there's a path between them, printing it if so.
+```
+o Alice Charlie
+```
 
 e or exit writes everything to the output file, frees all the memory and closes the program.
+```
+e
+```
 
 ## Automated Testing
 
