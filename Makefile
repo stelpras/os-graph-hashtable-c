@@ -31,6 +31,9 @@ Commands.o: Commands.c
 # clean house
 clean:
 	rm -f $(OBJS) $(OUT)
+	rm -f build.log diff.log
+	rm -f empty_input_difficult.txt
+	rm -f difficult_test_output.txt difficult_test_expected_output.txt difficult_test_run.log
 
 # do a bit of accounting
 count:

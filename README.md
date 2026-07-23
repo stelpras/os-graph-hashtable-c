@@ -1,133 +1,73 @@
 # os-graph-hashtable-c
 
-Lesson : Operating Systems
+Operating Systems course project (Programming Assignment 1).
 
-Student: Stylianos Prasianakis
+## What this is
 
-Lecturer : Alexios Delis
+This is a small C program called miris that models transactions between accounts as a graph. Every account is a node and every transaction is an edge going from one account to another, with an amount and a date attached to it. There's also a hash table on the side so we don't have to loop through the whole graph every time we want to check if an account exists.
 
-Programming assignment 1
+You can insert and delete accounts, add and delete transactions, look for cycles (loops of transactions that go back to where they started), trace paths a few steps out from an account, and check if two accounts are connected. All of this happens through a simple command prompt once the program is running.
 
-# Transaction Graph Analyzer (miris)
+## Build and run
 
-A C program that models financial transactions as a directed graph — nodes are accounts, edges are transactions carrying an amount and a date — backed by a custom hash table for fast lookups. Supports cycle detection, path finding, flow tracing, and other graph queries via an interactive command prompt.
+Just run make in the folder and then start it with an input and output file:
 
-## Features
-
-- **Graph modeling** — accounts are graph nodes; each transaction is a directed, weighted edge (`amount`, `date`) from source to destination account.
-- **Custom hash table** — accounts are indexed by name using a DJB2-based hash function, with separate chaining to resolve collisions, giving average O(1) insert/search/delete.
-- **Dynamic graph resizing** — the node table doubles in capacity whenever it fills up.
-- **Interactive command prompt** (`miris>`) supporting:
-  - Inserting nodes and edges
-  - Deleting nodes and edges
-  - Modifying existing edges
-  - Querying outgoing/incoming edges for a node
-  - Cycle detection (plain, and with a minimum-weight threshold)
-  - Flow tracing to a configurable depth
-  - Path finding and connectivity checks between two nodes
-- **File I/O** — reads an initial set of transactions from an input file and writes results to an output file.
-
-## Build & Run
-
-```bash
 make
-./miris -i <input_file> -o <output_file>
-```
+./miris -i input_file -o output_file
 
-Flags can be given in either order (`-i`/`-o`). Both are required.
+The two flags can be given in either order, but both are required or the program will complain and quit.
 
-Clean build artifacts:
-
-```bash
-make clean
-```
+To get rid of the compiled files afterwards run make clean.
 
 ## Commands
 
-Once running, `miris` reads commands from its `miris>` prompt. Each command has both a short and a long form:
+Every command has a short version and a longer, more readable version, and both work the same way.
 
-| Short | Long | Syntax | Description |
-|---|---|---|---|
-| `i` | `insert` | `i N1 N2 ...` | Insert one or more new accounts (nodes) |
-| `n` | `insert2` | `n Ni Nj sum date` | Add a transaction (edge) from `Ni` to `Nj` |
-| `d` | `delete` | `d N1 N2 ...` | Delete one or more accounts (and their edges) |
-| `l` | `delete2` | `l Ni Nj` | Delete the transaction from `Ni` to `Nj` |
-| `m` | `modify` | `m Ni Nj sum newSum date newDate` | Update the amount/date of an existing transaction |
-| `f` | `find` | `f Ni` | List outgoing transactions from `Ni` |
-| `r` | `receiving` | `r Ni` | List incoming transactions to `Ni` |
-| `c` | `circlefind` | `c Ni` | Find all cycles that start and end at `Ni` |
-| `fi` | `findcircles` | `fi Ni k` | Find cycles through `Ni` where every edge weight ≥ `k` |
-| `t` | `traceflow` | `t Ni m` | Trace all paths from `Ni` up to depth `m` |
-| `o` | `connect` | `o Ni Nj` | Check whether a path exists from `Ni` to `Nj`, and print it |
-| `e` | `exit` | `e` | Write the graph to the output file, free all memory, and exit |
+i or insert followed by one or more account names adds new accounts.
+n or insert2 followed by two accounts, an amount and a date adds a transaction between them.
+d or delete followed by account names removes those accounts along with their transactions.
+l or delete2 followed by two accounts removes the transaction between them.
+m or modify takes two accounts plus the old amount/date and the new amount/date, and updates that transaction.
+f or find followed by an account shows everything going out of it.
+r or receiving followed by an account shows everything coming into it.
+c or circlefind followed by an account looks for cycles that start and end there.
+fi or findcircles takes an account and a minimum weight, and only looks for cycles where every edge in them is at least that big.
+t or traceflow takes an account and a depth, and prints every path you can reach going that many steps out.
+o or connect takes two accounts and tells you if there's a path between them, printing it if so.
+e or exit writes everything to the output file, frees all the memory and closes the program.
 
 ## Testing
 
-A sample dataset is included: `input.txt` (loaded at startup) and `output.txt` (a prior run's result, for reference).
+There's a test script, test_miris.sh, that I put together so I wouldn't have to manually type commands every time I changed something in the code. You run it with:
 
-```bash
-make
-./miris -i input.txt -o output.txt
-```
+chmod +x test_miris.sh
+./test_miris.sh
 
-Try a few commands against the loaded sample data:
+It builds the project itself, then feeds it a sequence of commands and checks whether the output matches what it should be. At the very end it also compares the output file the program writes against a known correct version, so a passing run means the whole thing actually works end to end, not just that it compiles.
 
-```
-miris> f 1
-1 15 4000 2024-02-13
-```
-(node `1` has a single outgoing transaction to node `15`, matching the `input.txt` record `1 15 4000 2024-02-13`)
+To make this useful I built a small graph from scratch inside the test instead of using the sample input file, because the sample data didn't really have any cycles in it and cycles are basically the whole point of half these commands. The test graph has six accounts, A through F, with two cycles that share some nodes: A to B to C back to A, and B to C to D to E back to B. There's also one extra transaction from D to F that only exists so I have something to modify and delete without touching the cycles.
 
-```
-miris> o 1 15
-1 15
-```
-(a direct path exists from `1` to `15`)
+I ran through every single command against this graph by hand first to work out what the correct output should be, then ran the same thing against the actual compiled program to make sure I wasn't wrong about any of it, and that's what the test script checks automatically now.
 
-```
-miris> i 100
-Succ: 100
-```
-(inserts a new account `100`)
+A couple of things about the results that aren't obvious if you're just reading the code: when you ask for the edges going out of a node, the most recently added one shows up first, because new edges get stuck onto the front of the list instead of the back. When I run circlefind on A it only finds one of the two cycles, because the second cycle never actually passes through A. findcircles with a minimum weight ends up finding both cycles and tells you the smallest edge weight in each one. traceflow with a depth of 2 stops after two hops in every direction, which is just what the depth number means. And connect just returns whatever path it finds first, not the shortest one, since it's not doing anything fancy like BFS.
 
-```
-miris> e
-<N> Bytes released
-```
-(writes the final graph state to `output.txt`, frees all memory, and exits)
+## How the data is stored
 
-To verify a full run against the reference output, diff your generated file against the provided one:
+A node holds the account name, a linked list of its outgoing edges, and an index number that gets used later on for the DFS-based commands. An edge holds the destination node, the weight, the date, and a pointer to the next edge in that node's list, which is how one node ends up being able to have several transactions going out of it.
 
-```bash
-diff output.txt output_reference.txt
-```
+The graph itself is just an array of node pointers that doubles in size whenever it fills up. The hash table is an array of linked lists, where accounts that hash to the same spot get chained together instead of overwriting each other.
 
-## Data Structures
+Whenever a node gets added to the graph it also gets added to the hash table at the same time, and same with deletion, so checking whether an account already exists is fast without having to search through the whole graph.
 
-- **`Node`** — account name (`strdup`'d for a stable, independent copy), a linked list of outgoing `Edge`s, and an `index` used for fast array-based reference during DFS traversals.
-- **`Edge`** — destination node pointer, transaction weight, date (`strdup`'d), and a pointer to the next edge in the source node's list — allowing each node to have multiple outgoing edges.
-- **`Graph`** — a dynamic array of `Node*` plus current size/capacity, resized (doubled) on demand.
-- **`HashTable`** — an array of singly-linked `HashNode` chains, each holding a pointer to a `Node`. New entries are inserted at the head of their chain.
+## Complexity, roughly
 
-Every node inserted into the graph is mirrored in the hash table, giving fast existence checks and lookups for the rest of the command set.
+Hash table insert, search and delete are all O(1) on average, assuming the hash function spreads accounts out reasonably evenly. Adding a node is also O(1) unless the array needs to resize, in which case that one operation costs O(n). Adding an edge is O(n) though, because it has to loop through the node array to find both accounts involved instead of using the hash table — I know that's an obvious optimization I didn't get around to. Deleting a node is the worst one, roughly O(n squared) in the worst case, since it has to find the node, remove its outgoing edges, and then check every other node in the graph for edges pointing at the one being deleted. Deleting a single edge is O(n) since it just walks through one node's edge list.
 
-## Complexity Notes
+## Things I didn't get to
 
-| Operation | Complexity | Notes |
-|---|---|---|
-| Hash table insert/search/delete | O(1) average | Assumes reasonably distributed keys and a large enough table to avoid long chains |
-| Add node | O(1) amortized | O(n) only on the (occasional) resize |
-| Add edge | O(n) | Looks up both endpoints via linear scan of the node array — see *Known Limitations* |
-| Delete node | O(n²) worst case | O(n) to find the node, O(n) to clear its outgoing edges, O(n·k) to remove incoming edges referencing it (k = average edges per node) |
-| Delete edge | O(n) | Traverses the full edge list of the source node |
-
-## Known Limitations / Future Improvements
-
-- **`addEdge` uses a linear scan** to find its source/destination nodes rather than the hash table's O(1) `search`, which would be the natural optimization — not completed in this version.
-- **`deleteNodeFromGraph` searches linearly** rather than via the hash table, for the same reason; an attempted hash-table-based approach hit a segmentation fault that wasn't tracked down in time.
-- **No rehashing/resizing for the hash table** — its size is fixed at initialization (100 buckets). This keeps collision chains short in practice but means search complexity isn't guaranteed O(1) as the dataset grows arbitrarily large.
+addEdge searches for both accounts with a plain loop through the node array instead of using the hash table, which would obviously be faster. I ran out of time to change it. deleteNodeFromGraph has the same issue, and I actually tried switching it to use the hash table at one point but kept getting a segfault I couldn't figure out, so I left it as is. The hash table also doesn't resize or rehash, its size is just fixed at 100 from the start — that's fine for the graphs I tested with, but if you threw a huge number of accounts at it the chains would get long and searching wouldn't really stay O(1).
 
 ## Requirements
 
-- GCC (C99 or later)
-- POSIX environment (uses `unistd.h`)
+gcc and a Linux/POSIX environment, since the code uses unistd.h.
+
