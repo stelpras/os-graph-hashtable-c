@@ -154,6 +154,44 @@ else
     FAIL=$((FAIL + 1))
 fi
 
+# --- valgrind memory check ---------------------------------------------------
+
+echo
+echo "== Valgrind memory check =="
+if command -v valgrind > /dev/null 2>&1; then
+    VALGRIND_LOG="valgrind-miris.log"
+    {
+        echo "i A B C"
+        echo "n A B 100 2024-01-01"
+        echo "n B C 200 2024-01-02"
+        echo "f A"
+        echo "e"
+    } | valgrind --leak-check=full --log-file="$VALGRIND_LOG" \
+        "$BIN" -i "$EMPTY_INPUT" -o "$OUTPUT" > /dev/null 2>&1
+
+    if [ -f "$VALGRIND_LOG" ]; then
+        if grep -q "All heap blocks were freed" "$VALGRIND_LOG"; then
+            echo "  [PASS] valgrind: no memory leaks"
+            PASS=$((PASS + 1))
+        else
+            echo "  [FAIL] valgrind: no memory leaks"
+            FAIL=$((FAIL + 1))
+        fi
+        if grep -q "ERROR SUMMARY: 0 errors" "$VALGRIND_LOG"; then
+            echo "  [PASS] valgrind: 0 errors"
+            PASS=$((PASS + 1))
+        else
+            echo "  [FAIL] valgrind: 0 errors"
+            FAIL=$((FAIL + 1))
+        fi
+        echo "  (full valgrind output saved to $VALGRIND_LOG)"
+    else
+        echo "  [SKIP] valgrind log not created"
+    fi
+else
+    echo "  [SKIP] valgrind not installed"
+fi
+
 # --- summary -----------------------------------------------------------------
 
 echo
