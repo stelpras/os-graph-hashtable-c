@@ -6,13 +6,13 @@ Student: Stylianos Prasianakis
 
 Programming assignment 1
 
-## What this is
+## Project Description
 
 This is a small C program called miris that models transactions between accounts as a graph. Every account is a node and every transaction is an edge going from one account to another, with an amount and a date attached to it. There's also a hash table on the side so we don't have to loop through the whole graph every time we want to check if an account exists.
 
 You can insert and delete accounts, add and delete transactions, look for cycles (loops of transactions that go back to where they started), trace paths a few steps out from an account, and check if two accounts are connected. All of this happens through a simple command prompt once the program is running.
 
-## Build and run
+## Compilation & Execution
 
 Just run make in the folder and then start it with an input and output file:
 
@@ -29,7 +29,7 @@ To get rid of the compiled files afterwards run:
 make clean
 ```
 
-## Commands
+## Supported Commands
 
 Every command has a short version and a longer, more readable version, and both work the same way.
 
@@ -57,7 +57,7 @@ o or connect takes two accounts and tells you if there's a path between them, pr
 
 e or exit writes everything to the output file, frees all the memory and closes the program.
 
-## Testing
+## Automated Testing
 
 There's a test script, test_miris.sh, that I put together so I wouldn't have to manually type commands every time I changed something in the code. You run it with:
 
@@ -84,7 +84,7 @@ traceflow with a depth of 2 stops after two hops in every direction, which is ju
 
 And connect just returns whatever path it finds first, not the shortest one, since it's not doing anything fancy like BFS.
 
-## How the data is stored
+## Data Structures
 
 A node holds the account name, a linked list of its outgoing edges, and an index number that gets used later on for the DFS-based commands.
 
@@ -94,7 +94,7 @@ The graph itself is just an array of node pointers that doubles in size whenever
 
 Whenever a node gets added to the graph it also gets added to the hash table at the same time, and same with deletion, so checking whether an account already exists is fast without having to search through the whole graph.
 
-## Complexity, roughly
+## Complexity Analysis
 
 Hash table insert, search and delete are all O(1) on average, assuming the hash function spreads accounts out reasonably evenly.
 
@@ -106,7 +106,7 @@ Deleting a node is the worst one, roughly O(n squared) in the worst case, since 
 
 Deleting a single edge is O(n) since it just walks through one node's edge list.
 
-## Things I didn't get to
+## Known Limitations
 
 addEdge searches for both accounts with a plain loop through the node array instead of using the hash table, which would obviously be faster. I ran out of time to change it.
 
@@ -114,6 +114,6 @@ deleteNodeFromGraph has the same issue, and I actually tried switching it to use
 
 The hash table also doesn't resize or rehash, its size is just fixed at 100 from the start. That's fine for the graphs I tested with, but if you threw a huge number of accounts at it the chains would get long and searching wouldn't really stay O(1).
 
-## Requirements
+## Prerequisites
 
 gcc and a Linux/POSIX environment, since the code uses unistd.h.
